@@ -1,5 +1,4 @@
 
 # Párhuzamos beadandó téma/témák
 
-Képfeldolgozás - homályosítás/élesítés
-
+Beadandóm témája a filterezés, azon belül is a homályosítás, pthread segítségével párhuzamosítva.
