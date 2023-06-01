@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1685632809 source:c:\egyetemes\codeblocks\blur\main.c
+	<stdio.h>
+	<stdlib.h>
+	<pthread.h>
+	<time.h>
+

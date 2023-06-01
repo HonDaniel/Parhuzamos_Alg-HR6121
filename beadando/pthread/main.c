@@ -1,49 +1,53 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
 
-#define IMAGE_WIDTH 640
-#define IMAGE_HEIGHT 480
-#define NUM_THREADS 3
+#define NUM_THREADS 6
 
 typedef struct {
     int start;
     int end;
     unsigned char* image;
+    int imageWidth;
+    int imageHeight;
 } ThreadArgs;
 
-const float blurKernel[3][3] = {
-    {2.0 / 32, 4.0 / 32, 2.0 / 32},
-    {4.0 / 32, 8.0 / 32, 4.0 / 32},
-    {2.0 / 32, 4.0 / 32, 2.0 / 32}
+const float blurKernel[7][7] = {
+    {1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49},
+    {1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49},
+    {1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49},
+    {1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49},
+    {1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49},
+    {1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49},
+    {1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49, 1.0 / 49}
 };
 
-void applyBlur(unsigned char* image, int start, int end) {
-    unsigned char* tempImage = (unsigned char*)malloc((end - start) * 3 * sizeof(unsigned char));
-    for (int i = start; i < end; i++) {
-
-        int x = (i / 3) % IMAGE_WIDTH;
-        int y = (i / 3) / IMAGE_WIDTH;
+void applyBlur(unsigned char* image, int start, int end, int imageWidth, int imageHeight) {
+    unsigned char* tempImage = (unsigned char*)malloc((end - start) * sizeof(unsigned char));
+    for (int i = start; i < end; i += 3) {
+        int pixelIndex = i / 3;
+        int y = pixelIndex / imageWidth;
+        int x = pixelIndex % imageWidth;
 
         float sumR = 0.0, sumG = 0.0, sumB = 0.0;
-        int pixelIndex = i;
-        for (int dy = -1; dy <= 1; dy++) {
-            for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -3; dy <= 3; dy++) {
+            for (int dx = -3; dx <= 3; dx++) {
                 int nx = x + dx;
                 int ny = y + dy;
-                if (nx >= 0 && nx < IMAGE_WIDTH && ny >= 0 && ny < IMAGE_HEIGHT) {
-                    int kernelX = dx + 1;
-                    int kernelY = dy + 1;
-                    int neighborPixelIndex = ((ny * IMAGE_WIDTH + nx) * 3) + pixelIndex % 3;
+                if (nx >= 0 && nx < imageWidth && ny >= 0 && ny < imageHeight) {
+                    int kernelX = dx + 3;
+                    int kernelY = dy + 3;
+                    int neighborPixelIndex = ((ny * imageWidth + nx) * 3);
                     sumR += image[neighborPixelIndex] * blurKernel[kernelY][kernelX];
                     sumG += image[neighborPixelIndex + 1] * blurKernel[kernelY][kernelX];
                     sumB += image[neighborPixelIndex + 2] * blurKernel[kernelY][kernelX];
                 }
             }
         }
-        tempImage[i - start] = (unsigned char)(sumR + 0.5);
-        tempImage[i - start + 1] = (unsigned char)(sumG + 0.5);
-        tempImage[i - start + 2] = (unsigned char)(sumB + 0.5);
+        tempImage[(i - start)] = (unsigned char)(sumR + 0.5);
+        tempImage[(i - start) + 1] = (unsigned char)(sumG + 0.5);
+        tempImage[(i - start) + 2] = (unsigned char)(sumB + 0.5);
     }
 
     for (int i = start; i < end; i++) {
@@ -55,26 +59,26 @@ void applyBlur(unsigned char* image, int start, int end) {
 
 void* blurThread(void* args) {
     ThreadArgs* threadArgs = (ThreadArgs*)args;
-    applyBlur(threadArgs->image, threadArgs->start, threadArgs->end);
+    applyBlur(threadArgs->image, threadArgs->start, threadArgs->end, threadArgs->imageWidth, threadArgs->imageHeight);
     pthread_exit(NULL);
 }
 
-void saveImage(const char* filename, unsigned char* image) {
+void saveImage(const char* filename, unsigned char* image, int imageWidth, int imageHeight) {
     FILE* file = fopen(filename, "wb");
     if (file == NULL) {
         printf("Failed to save image.\n");
         return;
     }
 
-    fprintf(file, "P6\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
+    fprintf(file, "P6\n%d %d\n255\n", imageWidth, imageHeight);
 
-    fwrite(image, sizeof(unsigned char), IMAGE_WIDTH * IMAGE_HEIGHT * 3, file);
+    fwrite(image, sizeof(unsigned char), imageWidth * imageHeight * 3, file);
 
     fclose(file);
 }
 
 int main() {
-    FILE* file = fopen("art.ppm", "rb");
+    FILE* file = fopen("highres.ppm", "rb");
     if (file == NULL) {
         printf("Failed to load image.\n");
         return -1;
@@ -90,26 +94,25 @@ int main() {
 
     int imageWidth, imageHeight, maxValue;
     fscanf(file, "%d %d\n%d\n", &imageWidth, &imageHeight, &maxValue);
-    if (imageWidth != IMAGE_WIDTH || imageHeight != IMAGE_HEIGHT || maxValue != 255) {
-        printf("Invalid image dimensions.\n");
-        fclose(file);
-        return -1;
-    }
 
-    unsigned char* image = (unsigned char*)malloc(IMAGE_WIDTH * IMAGE_HEIGHT * 3 * sizeof(unsigned char));
-    fread(image, sizeof(unsigned char), IMAGE_WIDTH * IMAGE_HEIGHT * 3, file);
+    unsigned char* image = (unsigned char*)malloc(imageWidth * imageHeight * 3 * sizeof(unsigned char));
+    fread(image, sizeof(unsigned char), imageWidth * imageHeight * 3, file);
 
     fclose(file);
 
-    int sectionSize = (IMAGE_WIDTH * IMAGE_HEIGHT * 3) / NUM_THREADS;
+    int sectionSize = (imageWidth * imageHeight * 3) / NUM_THREADS;
 
     pthread_t threads[NUM_THREADS];
     ThreadArgs threadArgs[NUM_THREADS];
 
+    clock_t start = clock();
+
     for (int i = 0; i < NUM_THREADS; i++) {
         threadArgs[i].start = i * sectionSize;
-        threadArgs[i].end = (i + 1) * sectionSize;
+        threadArgs[i].end = (i == NUM_THREADS - 1) ? (imageWidth * imageHeight * 3) : ((i + 1) * sectionSize);
         threadArgs[i].image = image;
+        threadArgs[i].imageWidth = imageWidth;
+        threadArgs[i].imageHeight = imageHeight;
         pthread_create(&threads[i], NULL, blurThread, (void*)&threadArgs[i]);
     }
 
@@ -117,7 +120,12 @@ int main() {
         pthread_join(threads[i], NULL);
     }
 
-    saveImage("blurred_art.ppm", image);
+    clock_t end = clock();
+    double elapsedSeconds = (double)(end - start) / CLOCKS_PER_SEC;
+
+    printf("Elapsed time: %f", elapsedSeconds);
+
+    saveImage("highres_blur.ppm", image, imageWidth, imageHeight);
 
     free(image);
 

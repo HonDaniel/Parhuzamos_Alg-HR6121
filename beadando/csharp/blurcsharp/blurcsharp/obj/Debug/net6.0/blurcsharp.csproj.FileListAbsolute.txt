@@ -1,0 +1,15 @@
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\bin\Debug\net6.0\blurcsharp.exe
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\bin\Debug\net6.0\blurcsharp.deps.json
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\bin\Debug\net6.0\blurcsharp.runtimeconfig.json
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\bin\Debug\net6.0\blurcsharp.dll
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\bin\Debug\net6.0\blurcsharp.pdb
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.csproj.AssemblyReference.cache
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.AssemblyInfoInputs.cache
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.AssemblyInfo.cs
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.csproj.CoreCompileInputs.cache
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.dll
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\refint\blurcsharp.dll
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.pdb
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\blurcsharp.genruntimeconfig.cache
+C:\Egyetemes\IV. Felev\csharp\blurcsharp\blurcsharp\obj\Debug\net6.0\ref\blurcsharp.dll
